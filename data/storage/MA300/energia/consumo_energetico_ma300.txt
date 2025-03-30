@@ -1,0 +1,24 @@
+Sitio: MA300
+Fecha de registro: 2024-03-30
+Última actualización: 2024-03-30
+
+Consumo Energético Mensual:
+- Enero 2024: 3,150 kWh
+- Febrero 2024: 2,980 kWh
+- Marzo 2024: 3,250 kWh
+
+Estado de Equipos:
+- UPS Principal: Funcionando al 92% de capacidad
+- Baterías: 32 celdas, estado óptimo
+- Sistema de ventilación: Operativo con optimización automática
+
+Medidas de Eficiencia:
+- Sistema de control de temperatura inteligente instalado
+- Programación de ventilación basada en ocupación
+- Monitoreo en tiempo real de consumo
+
+Observaciones:
+- Incremento de consumo del 5% respecto al mes anterior
+- Requiere revisión de sistema de ventilación
+- Cumple con normativa de eficiencia energética
+- Plan de optimización energética en implementación 

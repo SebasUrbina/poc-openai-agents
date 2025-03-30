@@ -1,0 +1,24 @@
+Sitio: SA001
+Fecha de registro: 2024-03-30
+Última actualización: 2024-03-30
+
+Consumo Energético Mensual:
+- Enero 2024: 1,850 kWh
+- Febrero 2024: 1,920 kWh
+- Marzo 2024: 1,950 kWh
+
+Estado de Equipos:
+- UPS Principal: Funcionando al 78% de capacidad
+- Baterías: 16 celdas, estado óptimo
+- Sistema de ventilación: Operativo
+
+Medidas de Eficiencia:
+- Control de temperatura centralizado
+- Sistema de ventilación programado
+- Monitoreo básico de consumo
+
+Observaciones:
+- Consumo estable en los últimos 3 meses
+- Requiere actualización de sistema de monitoreo
+- Cumple con normativa de eficiencia energética
+- Plan de modernización pendiente de aprobación 

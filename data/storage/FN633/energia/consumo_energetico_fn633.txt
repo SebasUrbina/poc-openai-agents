@@ -1,0 +1,23 @@
+Sitio: FN633
+Fecha de registro: 2024-03-30
+Última actualización: 2024-03-30
+
+Consumo Energético Mensual:
+- Enero 2024: 2,450 kWh
+- Febrero 2024: 2,380 kWh
+- Marzo 2024: 2,520 kWh
+
+Estado de Equipos:
+- UPS Principal: Funcionando al 85% de capacidad
+- Baterías: 24 celdas, estado óptimo
+- Sistema de ventilación: Operativo
+
+Medidas de Eficiencia:
+- Implementado sistema de control de temperatura automático
+- Optimización de horarios de ventilación
+- Monitoreo remoto de consumo
+
+Observaciones:
+- Se detectó un pico de consumo el 15/03/2024
+- Requiere mantenimiento preventivo de baterías en próximo trimestre
+- Cumple con normativa de eficiencia energética 
