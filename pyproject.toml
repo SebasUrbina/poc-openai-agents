@@ -1,0 +1,15 @@
+[project]
+name = "poc-openai-agents"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "loguru>=0.7.3",
+    "openai-agents>=0.0.6",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]
