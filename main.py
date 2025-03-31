@@ -14,8 +14,6 @@ from agents import (
 from pydantic import BaseModel, Field
 from loguru import logger
 
-main_agent = Agent(name="NetworkGPT", instructions="You are a helpful assistant")
-
 
 class Categories(str, Enum):
     energia = "energia"
@@ -30,6 +28,7 @@ class AgentOutput(BaseModel):
     doc_category: Categories | None
 
 
+# Agente que extrae la intención del usuario y devuelve un objeto con la query, el nemonico del POP/Antena/Sitio y la categoría de documento.
 intent_agent = Agent(
     name="Intent agent",
     instructions="Eres un experto en identificar la intención del usuario y devuelve un objeto con la query, el nemonico del POP/Antena/Sitio y la categoría de documento.",
@@ -37,6 +36,7 @@ intent_agent = Agent(
 )
 
 
+# Agente que busca en la base de datos de documentos y entrega la información al usuario.
 def create_file_search_agent(query: str, nemonico: str, doc_category: Categories):
     return Agent(
         name="File searcher",
