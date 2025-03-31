@@ -87,28 +87,29 @@ async def main():
             logger.info("Running intent agent")
             intent_result = await Runner.run(agent, inputs)
             logger.info(f"Intent result: {intent_result.final_output}")
-            try:
-                query = intent_result.final_output.query
-                nemonico = intent_result.final_output.nemonico
-                doc_category = intent_result.final_output.doc_category.value
-            except:
-                logger.warning("No intent result found")
-                continue
+
+            query = intent_result.final_output.query
+            nemonico = intent_result.final_output.nemonico
+            doc_category = intent_result.final_output.doc_category
+
             # TODO: Create the agent workflow
             if nemonico and doc_category:
                 file_search_agent = create_file_search_agent(
-                    query, nemonico, doc_category
+                    query, nemonico, doc_category.value
                 )
                 file_search_agent_result = await Runner.run(file_search_agent, inputs)
                 logger.info(
                     f"File search agent result: {file_search_agent_result.final_output}"
                 )
+            else:
+                logger.warning("No intent result found")
+                user_msg = input("Enter a message: ")
+                inputs.append({"content": user_msg, "role": "user"})
+                continue
 
         inputs = file_search_agent_result.to_input_list()
-
         user_msg = input("Enter a message: ")
         inputs.append({"content": user_msg, "role": "user"})
-        # agent = intent_result.current_agent
 
 
 if __name__ == "__main__":
