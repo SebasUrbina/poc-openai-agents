@@ -15,7 +15,7 @@ VECTOR_STORE_ID = "vs_67e96e2e97888191be383a9f1349129a"
 def create_file_search_agent(query: str, nemonico: str, doc_category: Categories):
     return Agent(
         name="File searcher",
-        instructions="Eres un experto en redes de entregar informacion factual al usuario en base al contexto que recibes.",
+        instructions=PROMPT,
         tools=[
             FileSearchTool(
                 max_num_results=3,
