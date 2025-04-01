@@ -7,14 +7,18 @@ from agents import (
     Agent,
     FileSearchTool,
     RawResponsesStreamEvent,
+    RunContextWrapper,
     Runner,
     TResponseInputItem,
     trace,
     InputGuardrail,
+    input_guardrail,
     GuardrailFunctionOutput,
+    InputGuardrailTripwireTriggered,
 )
 from pydantic import BaseModel, Field
 from loguru import logger
+import json
 
 
 class Categories(str, Enum):
@@ -42,9 +46,16 @@ guardrail_agent = Agent(
 )
 
 
-async def consulta_guardrail(ctx, agent, input_data):
+@input_guardrail
+async def consulta_guardrail(
+    ctx: RunContextWrapper[None],
+    agent: Agent,
+    input_data: str | list[TResponseInputItem],
+) -> GuardrailFunctionOutput:
+    """This is an input guardrail function, which happens to call an agent to check if the input is valid and related to antennas."""
     result = await Runner.run(guardrail_agent, input_data, context=ctx.context)
     final_output = result.final_output_as(ConsultaOutput)
+
     return GuardrailFunctionOutput(
         output_info=final_output,
         tripwire_triggered=not final_output.is_valid_query,
@@ -55,9 +66,7 @@ intent_agent = Agent(
     name="Intent agent",
     instructions="Eres un experto en identificar la intención del usuario y devuelve un objeto con la query, el nemonico del POP/Antena/Sitio y la categoría de documento.",
     output_type=AgentOutput,
-    input_guardrails=[
-        InputGuardrail(guardrail_function=consulta_guardrail),
-    ],
+    input_guardrails=[consulta_guardrail],
 )
 
 
@@ -84,54 +93,44 @@ def create_file_search_agent(query: str, nemonico: str, doc_category: Categories
 
 # read this: https://github.com/openai/openai-agents-python/blob/main/examples/handoffs/message_filter_streaming.py
 async def main():
+
     logger.info("Starting NetworkGPT")
     conversation_id = str(uuid.uuid4().hex)
-
-    msg = input("Hola, ¿en qué puedo ayudarte hoy?: ")
-
-    agent = intent_agent
-    inputs: list[TResponseInputItem] = [{"content": msg, "role": "user"}]
+    inputs: list[TResponseInputItem] = []
 
     while True:
         with trace("NetworkGPT", group_id=conversation_id):
             try:
+                user_input = input("Hola, ¿en qué puedo ayudarte hoy?: ")
+                inputs.append({"content": user_input, "role": "user"})
+                logger.info(f"Inputs: {json.dumps(inputs, indent=2)}")
                 logger.info("Running intent agent")
-                intent_result = await Runner.run(agent, inputs)
-                logger.info(f"Intent result: {intent_result.final_output}")
+                result = await Runner.run(intent_agent, inputs)
+                logger.info(f"Intent result: {result.final_output}")
 
-                query = intent_result.final_output.query
-                nemonico = intent_result.final_output.nemonico
-                doc_category = intent_result.final_output.doc_category
+                query = result.final_output.query
+                nemonico = result.final_output.nemonico
+                doc_category = result.final_output.doc_category
 
-                # TODO: Create the agent workflow
                 if nemonico and doc_category:
                     file_search_agent = create_file_search_agent(
                         query, nemonico, doc_category.value
                     )
-                    file_search_agent_result = await Runner.run(
-                        file_search_agent, inputs
-                    )
-                    logger.info(
-                        f"File search agent result: {file_search_agent_result.final_output}"
-                    )
+                    logger.info("Running file search agent")
+                    result = await Runner.run(file_search_agent, inputs)
+                    inputs = result.to_input_list()
+                    logger.info(f"File search agent result: {result.final_output}")
                 else:
                     logger.warning("No intent result found")
-                    user_msg = input("Ingresa un mensaje: ")
-                    inputs.append({"content": user_msg, "role": "user"})
-                    continue
+                    msg = "Lo siento, no puedo identificar el POP/Antena/Sitio. Por favor, intenta reformular tu consulta."
+                    logger.warning(msg)
+                    inputs.append({"content": msg, "role": "assistant"})
 
-            except Exception as e:
-                logger.error(f"Error durante la ejecución: {str(e)}")
-                print(
-                    "Lo siento, hubo un error. Por favor, intenta reformular tu consulta."
-                )
-                user_msg = input("Ingresa un mensaje: ")
-                inputs.append({"content": user_msg, "role": "user"})
-                continue
-
-        inputs = file_search_agent_result.to_input_list()
-        user_msg = input("Enter a message: ")
-        inputs.append({"content": user_msg, "role": "user"})
+            except InputGuardrailTripwireTriggered:
+                logger.error(f"Triggered guardrail")
+                msg = "Lo siento, hubo un error. Por favor, intenta reformular tu consulta."
+                logger.warning(msg)
+                inputs.append({"content": msg, "role": "assistant"})
 
 
 if __name__ == "__main__":
